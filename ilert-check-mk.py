@@ -48,11 +48,14 @@ def send(endpoint, port, apiKey, xml):
         else:
             log("ERROR", "could not send event to iLert. HTTP error code %s, reason: %s, %s" % (
                 e.code, e.reason, e.read()))
+            exit(1)
     except urllib.error.URLError as e:
         log("ERROR", "could not send event to iLert. Reason: %s\n" % e.reason)
+        exit(1)
     except Exception as e:
         log("ERROR", "an unexpected error occurred. Please report a bug. Cause: %s %s" % (
             type(e), e.args))
+        exit(1)
     else:
         log("INFO", "Event has been sent to iLert")
 
