@@ -43,6 +43,7 @@ def send(endpoint, port, apiKey, xml):
     except urllib.error.HTTPError as e:
         if e.code == 429:
             log("WARNING", "too many requests, will try later. Server response: %s" % e.read())
+            exit(1)
         elif 400 <= e.code <= 499:
             log("WARNING", "event not accepted by iLert. Reason: %s" % e.read())
         else:
