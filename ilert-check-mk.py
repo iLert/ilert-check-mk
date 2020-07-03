@@ -78,7 +78,7 @@ def main():
         description='send events from CheckMK to iLert')
     parser.add_argument(
         '-a', '--apikey', help='API key for the alert source in iLert')
-    parser.add_argument('-e', '--endpoint', default='https://api.ilert.dev',
+    parser.add_argument('-e', '--endpoint', default='https://api.ilert.com',
                         help='iLert API endpoint (default: %(default)s)')
     parser.add_argument('-p', '--port', type=int, default=443,
                         help='endpoint port (default: %(default)s)')
