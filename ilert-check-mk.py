@@ -14,6 +14,7 @@ import urllib
 import uuid
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
+from cmk.notification_plugins import utils
 import argparse
 import io
 import sys
@@ -27,8 +28,8 @@ def log(level, message):
                      (datetime.datetime.now().isoformat(), level, message))
 
 
-def create_and_send(endpoint, port, apiKey, payload):
-    xml_doc = create_xml(payload)
+def create_and_send(endpoint, port, apiKey, context):
+    xml_doc = create_xml(context)
     send(endpoint, port, apiKey, xml_doc)
 
 
@@ -61,12 +62,12 @@ def send(endpoint, port, apiKey, xml):
         log("INFO", "Event has been sent to iLert")
 
 
-def create_xml(payload):
+def create_xml(context):
     xml_doc = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><event><payload>'
 
-    for entry in payload:
+    for entry in context:
         xml_doc += "<entry key=%s>%s</entry>" % (
-            quoteattr(entry), str(escape(payload[entry])))
+            quoteattr(entry), str(escape(context[entry])))
 
     xml_doc += "</payload></event>"
 
@@ -88,30 +89,27 @@ def main():
                         help='event payload as key value pairs in the format key1=value1 key2=value2 ...')
     args = parser.parse_args()
 
-    # populate payload data from environment variables
-    payload = dict(PLUGIN_VERSION=PLUGIN_VERSION)
-    for env in os.environ:
-        if "NOTIFY_" in env:
-            payload[env] = os.environ[env]
+    # get all env vars to dict
+    context = utils.collect_context()
 
     # ... and payload specified via command line
     for arg in args.payload:
         if arg:
             a = arg.split('=', 1)
             if a and a[0] and a[1]:
-                payload.update({a[0]: a[1]})
+                context.update({a[0]: a[1]})
 
     if args.apikey is not None:
         apikey = args.apikey
-    elif 'CONTACTPAGER' in payload:
-        apikey = payload['CONTACTPAGER']
+    elif 'PARAMETER_WEBHOOK_URL' in context:
+        apikey = context.get['PARAMETER_WBHOOK_URL']
     else:
         apikey = None
 
     if apikey is None:
         log("ERROR", "parameter apikey is required in save mode and must be provided either via command line or in the pager field of the contact definition in CheckMK")
         exit(1)
-    create_and_send(args.endpoint, args.port, apikey, payload)
+    create_and_send(args.endpoint, args.port, apikey, context)
 
     exit(0)
 
