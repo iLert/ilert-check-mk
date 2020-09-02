@@ -27,8 +27,8 @@ def send(endpoint, port, apiKey, context):
     log("INFO", "Sending event to iLert...")
     headers = {"Content-type": "application/json",
                "Accept": "application/json",
-               "Agent": "checkmk/native/%s" % PLUGIN_VERSION}
-    url = "%s:%s/api/v1/events/checkmk-native/%s" % (endpoint, port, apiKey)
+               "Agent": "checkmk/extension/%s" % PLUGIN_VERSION}
+    url = "%s:%s/api/v1/events/checkmk-ext/%s" % (endpoint, port, apiKey)
 
     try:
         response = requests.post(url,
