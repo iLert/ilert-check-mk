@@ -1,5 +1,7 @@
 # iLert plugin for checkmk
 
+> Note: we suggest using the [native ilert checkmk plugin](https://docs.ilert.com/integrations/checkmk/native)
+
 ## Requirements
 
 ```sh
